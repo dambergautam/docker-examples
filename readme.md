@@ -33,6 +33,7 @@ containers.
 - docker-compose up -d
 - docker exec -it 6da7468e01f1 bash (using container ID)
 - docker rmi <imageID> (Remove image)
+- docker rm <Names> (Remove container -List container `docker ps -as`)
 - docker inspect <image> (View details of an image or container)
 
 ## Dockerfile
@@ -77,3 +78,139 @@ hello-world`
 It is useful to reflect the changes without rebuilding container after each
 change.
 
+## Docker Build
+This method allows the users to build their own Docker images.
+
+**Syntax:** `docker build -t <imageName>:<tagName> ./dockerfile/path`
+
+**Example:** `docker build -t helloWorld:1.1 .`
+
+In above example, 'helloWorld' is the name we are giving to the Image, '1.1'
+is the Image tag number and '.' is path to Dockerfile which is current directory.
+
+To view the new Image, run `docker images` command.
+
+## Docker Compose
+
+**Directory Structure**
+```
+.
+|-- 2-docker-compose-demo
+    |-- docker-compose.yml
+    |-- product
+    |   |-- Dockerfile
+    |   |-- products.py
+    |   |-- requirements.txt
+    |-- website
+        |-- index.php
+```
+
+**File 1: docker-compose.yml**
+```
+version: '3'
+
+services: 
+    product-service:
+        build: ./product
+        volumes:
+         - ./product:/usr/src/app
+        ports:
+         - 5001:80
+
+    website:
+        image: php:apache
+        volumes:
+         - ./website:/var/www/html
+        ports:
+         - 5000:80
+        depends_on:
+         - product-service
+```
+
+**File 2: product/Dockerfile**
+```
+FROM python:3-onbuild
+COPY . /usr/src/app
+CMD ["python", "products.py"]
+```
+
+**File 3: product/products.py**
+```py
+# Product service 
+
+from flask import Flask
+from flask_restful import Resource, Api
+
+app = Flask(__name__)
+api = Api(app)
+
+class Product(Resource):
+    def get(self):
+        return {
+            'product': ['Ice Cream', 
+                        'Chocolate',
+                        'Fruit',
+                        'Eggs']
+        }
+
+api.add_resource(Product, '/')
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=80, debug=True)
+```
+
+**File 4: product/requirements.txt**
+```txt
+Flask==0.12
+flask-restful==0.3.5
+```
+
+**File 5: website/index.php**
+```php
+<html>
+    <head>
+        <title>My product list</title>
+    </head>
+
+    <body>
+        <h1>Product List</h1>
+        <ul>
+        <?php 
+            $json = file_get_contents('http://product-service');
+            $items = json_decode($json)->product;
+
+            foreach ($items as $item) {
+                echo "<li>".$item."</li>";
+            }
+        ?>
+        </ul>
+    </body>
+</html>
+```
+## Publish Docker images in Docker Hub
+**Example**
+
+Create repository (eg. webgautam) in Docker Hub (//hub.docker.com)
+
+Get the image id (eg: c19250dbff8a) that you want to push and tag it
+
+`docker tag c19250dbff8a webgautam/demorep:1.0`
+
+Login into the Docker Hub repo via command prompt
+
+`docker login`
+```
+Username: webgautam
+Password:
+Login Succeeded
+```
+Push the Image to the Docker Hub repository
+
+`docker push webgautam/demorep:1.0`
+
+
+**Pull Image** You can now delete images from Docker host
+(webgautam/demorep:1.0, 2dockercomposerdemo_product-service) and try to pull the
+repository
+
+`docker pull webgautam/demorep:1.0`
