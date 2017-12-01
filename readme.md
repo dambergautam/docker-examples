@@ -91,6 +91,11 @@ is the Image tag number and '.' is path to Dockerfile which is current directory
 To view the new Image, run `docker images` command.
 
 ## Docker Compose
+This method is used to run multiple containers as a single service. 
+In below example, the application requires python (that returns product list) 
+and php-apache server (to display product list). With the help of 
+docker-compose.yml file we can start both the containers as a service without
+the need to start each one separately.
 
 **Directory Structure**
 ```
