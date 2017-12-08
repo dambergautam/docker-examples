@@ -192,6 +192,21 @@ flask-restful==0.3.5
     </body>
 </html>
 ```
+## Data Volume
+Data Volume is a separate volume that can be shared across containers. They are
+initialized when container is created and can be reused or shared between many
+containers.
+
+You can see the volume mapping by inspecting image, eg. `docker inspect Jenkins`
+Now, to map the volume ('-v') in the container to a local volume run
+
+```docker run –d –v /home/demo:/var/jenkins_home –p 8080:8080 –p 50000:50000
+jenkins```
+
+**Create Volume** `docker volume create –-name=demo –opt o=size=100m`
+
+**List Volume** `docker volume ls`
+
 ## Publish Docker images in Docker Hub
 **Example**
 
