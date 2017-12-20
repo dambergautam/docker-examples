@@ -40,7 +40,134 @@ big group called namespace. It isolate its contents from everybody's stuff.
 
 <img src='./namespaces.png' height='390px' alt='Namespaces'>
 
-## Application Deployment
+### 6. Deployment
+To deploy your containerized applications you need to create a Kubernetes Deployment configuration. It instructs Kubernetes how to create/update instances of your application, generate pods and connect to other services. 
+
+### 7. Secret 
+A secret hold sensitive information such as passowords, OAuth token, and ssh keys. It allow for more control, secure and flexible storage of sensitive information.
+
+### 8. PVC
+PersistentVolume (PV) provides an API for users and administrators that abstracts details of how storage is provided from how it is consumed.
+
+PersistantVolumeClaim (PVC) is a request for storage by a user. It is similar to a pod. Pods consume node resources and PVCs consume PV resources.
+
+### 9. Quota
+It's useful to know about the aggregate resource consumption per namespace as you will at times check if the namespace has enough computational resources for your pod.
+
+- Get quota name `kubectl get quota`
+- Describe `kubectl describe quota <quota-name>`
+```
+Name:            compute-resources
+Namespace:       webops-uat
+Resource         Used    Hard
+--------         ----    ----
+limits.cpu       1850m   4
+limits.memory    3584Mi  8Gi
+pods             4       8
+requests.cpu     1200m   2
+requests.memory  2560Mi  4Gi
+```
+
+## Kubectl basics
+
+### `kubectl get <deployments|pods|services>`
+
+**Examples:**
+```
+  # List all pods in ps output format.
+  kubectl get pods
+
+  # List all pods in ps output format with more information (such as node name).
+  kubectl get pods -o wide
+
+  # Get a specified deployment file configuration in YAML output format.
+  kubectl get deployment <deployment_file_name> -o yaml
+
+  # List a single replication controller with specified NAME in ps output format.
+  kubectl get replicationcontroller web
+
+  # List a single pod in JSON output format.
+  kubectl get -o json pod web-pod-13je7
+
+  # List all replication controllers and services together in ps output format.
+  kubectl get rc,services
+
+  # List one or more resources by their type and names.
+  kubectl get rc/web service/frontend pods/web-pod-13je7
+
+  # List all resources with different types.
+  kubectl get all
+```
+
+### `kubectl describe <deployments|pods|services>`
+Show details of a specific resource or group of resources.
+
+**Example**
+```
+  # Describe a node
+  kubectl describe nodes kubernetes-node-emt8.c.myproject.internal
+
+  # Describe a pod
+  kubectl describe pods/nginx
+
+  # Describe a pod identified by type and name in "pod.json"
+  kubectl describe -f pod.json
+```
+
+### `kubectl log <OPTIONS>`
+Print the logs for a container in a pod or specified resource. 
+
+**Example**
+```
+  # Return snapshot logs from pod nginx with only one container
+  kubectl logs nginx
+
+  # Return snapshot logs for the pods defined by label app=nginx
+  kubectl logs -lapp=nginx
+
+  # Display only the most recent 20 lines of output in pod nginx
+  kubectl logs --tail=20 nginx
+
+  # Return snapshot logs from first container of a job named hello
+  kubectl logs job/hello
+```
+
+### `kubectl <create|replace|apply> -f path/to/yaml/config/file`
+`kubectl create` To create a resource from a file
+
+`kubectl apply` To apply a configuration to a resource by filename
+
+`kubectl replace` To replace a resource by filename
+
+**Example**
+```
+  # Create a pod using the data in pod.json.
+  kubectl create -f ./pod.json
+
+  # Apply the configuration in pod.json to a pod.
+  kubectl apply -f ./pod.json
+
+  # Replace a pod using the data in pod.json.
+  kubectl replace -f ./pod.json
+
+  # Force replace, delete and then re-create the resource
+  kubectl replace --force -f ./pod.json
+```  
+
+### `kubectl exec`
+Execute a command in a container.
+
+**Example:**
+```
+  # Execute bash in specified pod in interactive mode
+  kubectl exec -it <POD_NAME> bash
+
+  # Get output from running 'date' from pod 123456-7890, using the first container by default
+  kubectl exec 123456-7890 date
+```
+
+## An example of Conceptual Kubernetes Deployment
+
 - Build your docker image file
 - Push the image to docker registry (see build.sh)
 - To run build.sh `bash build.sh -v 0.0.2`
@@ -57,18 +184,3 @@ big group called namespace. It isolate its contents from everybody's stuff.
 - `kubectl get pvc -o yaml`
 - Execute container bash:w
 - `kubectl exec -it academy-3544580744-2fq3e bash`
-
-## Check resources
-- Get quota name `kubectl get quota`
-- Describe `kubectl describe quota <quota-name>`
-```
-Name:            compute-resources
-Namespace:       webops-uat
-Resource         Used    Hard
---------         ----    ----
-limits.cpu       1850m   4
-limits.memory    3584Mi  8Gi
-pods             4       8
-requests.cpu     1200m   2
-requests.memory  2560Mi  4Gi
-```

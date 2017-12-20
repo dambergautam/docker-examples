@@ -90,6 +90,19 @@ is the Image tag number and '.' is path to Dockerfile which is current directory
 
 To view the new Image, run `docker images` command.
 
+**Others**
+
+`docker-compose build` -Only builds the images, do not start the containers
+
+`docker-compose up` -Build the images if required and start the containers
+
+`docker-compose up --build` -Forced to build the images even when not needed
+
+`docker-compose up --no-build` -Skips the image build process abd start the containers
+
+    
+
+
 ## Docker Compose
 This method is used to run multiple containers as a single service. 
 In below example, the application requires python (that returns product list) 
@@ -192,6 +205,8 @@ flask-restful==0.3.5
     </body>
 </html>
 ```
+Browser url `http://localhost:5000/`
+
 ## Data Volume
 Data Volume is a separate volume that can be shared across containers. They are
 initialized when container is created and can be reused or shared between many
@@ -200,8 +215,7 @@ containers.
 You can see the volume mapping by inspecting image, eg. `docker inspect Jenkins`
 Now, to map the volume ('-v') in the container to a local volume run
 
-```docker run –d –v /home/demo:/var/jenkins_home –p 8080:8080 –p 50000:50000
-jenkins```
+`docker run –d –v /home/demo:/var/jenkins_home –p 8080:8080 –p 50000:50000 jenkins`
 
 **Create Volume** `docker volume create –-name=demo –opt o=size=100m`
 
@@ -219,7 +233,7 @@ Get the image id (eg: c19250dbff8a) that you want to push and tag it
 Login into the Docker Hub repo via command prompt
 
 `docker login`
-```
+```cmd
 Username: webgautam
 Password:
 Login Succeeded
